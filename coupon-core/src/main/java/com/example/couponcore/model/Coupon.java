@@ -1,5 +1,10 @@
 package com.example.couponcore.model;
 
+import static com.example.couponcore.exception.ErrorCode.INVALID_COUPON_ISSUE_DATE;
+import static com.example.couponcore.exception.ErrorCode.INVALID_COUPON_ISSUE_QUANTITY;
+
+import com.example.couponcore.exception.CouponIssueException;
+import com.example.couponcore.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -67,11 +72,11 @@ public class Coupon extends BaseTimeEntity {
   public void issue() {
     //수량검증 실패시
     if(!availableIssueQuantity()) {
-      throw new RuntimeException("수량 검증");
+      throw new CouponIssueException(INVALID_COUPON_ISSUE_QUANTITY, "발급 가능한 수량을 초과합니다. total : %s, issued: %s".formatted(totalQuantity, issuedQuantity));
     }
     //발급기한 실패시
     if(!availableIssueDate()) {
-      throw new RuntimeException("기한 검증");
+      throw new CouponIssueException(INVALID_COUPON_ISSUE_DATE, "발급 가능한 일자가 아닙니다. request : %s, issueStart : %s, issueEnd: %s".formatted(LocalDateTime.now(), dateIssueStart, dateIssueEnd));
     }
     //다 통과시 수량증가
     issuedQuantity++; //외부이슈누를시 발급수량증가
