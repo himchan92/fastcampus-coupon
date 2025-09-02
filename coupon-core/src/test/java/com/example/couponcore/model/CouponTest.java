@@ -1,5 +1,7 @@
 package com.example.couponcore.model;
 
+import static com.example.couponcore.exception.ErrorCode.INVALID_COUPON_ISSUE_QUANTITY;
+
 import com.example.couponcore.exception.CouponIssueException;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Assertions;
@@ -53,5 +55,6 @@ class CouponTest {
 
     //when & then
     CouponIssueException exception = Assertions.assertThrows(CouponIssueException.class, coupon::issue);
+    Assertions.assertEquals(exception.getErrorCode(), INVALID_COUPON_ISSUE_QUANTITY);
   }
 }
