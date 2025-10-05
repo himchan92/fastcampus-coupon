@@ -49,4 +49,35 @@ public class Coupon
 
     @Column(nullable = false)
     private LocalDateTime dateIssueEnd;
+
+    //=======검증메소드=======
+
+    //발급수량
+    public boolean availableIssueQuantity() {
+        if(totalQuantity == null) {
+            return true;
+        }
+        return totalQuantity > issuedQuantity;
+    }
+
+    //발급기한
+    public boolean availableIssueDate() {
+        LocalDateTime now = LocalDateTime.now();
+        return dateIssueStart.isBefore(now) && dateIssueEnd.isAfter(now);
+    }
+
+    public void issue() {
+        //수량검증
+        if(!availableIssueQuantity()) {
+            throw new RuntimeException("수량 검증"); //예외는 커스텀예외 권장
+        }
+
+        //기한검증
+        if(!availableIssueDate()) {
+            throw new RuntimeException("기한 검증"); //예외는 커스텀예외 권장
+        }
+
+        //검증 다통과되어야 수행
+        issuedQuantity++;
+    }
 }
