@@ -1,5 +1,10 @@
 package com.fastcampus.couponcore.model;
 
+import static com.fastcampus.couponcore.exception.ErrorCode.INVALID_COUPON_ISSUE_DATE;
+import static com.fastcampus.couponcore.exception.ErrorCode.INVALID_COUPON_ISSUE_QUANTITY;
+
+import com.fastcampus.couponcore.exception.CouponIssueException;
+import com.fastcampus.couponcore.exception.ErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -69,12 +74,12 @@ public class Coupon
     public void issue() {
         //수량검증
         if(!availableIssueQuantity()) {
-            throw new RuntimeException("수량 검증"); //예외는 커스텀예외 권장
+            throw new CouponIssueException(INVALID_COUPON_ISSUE_QUANTITY, "발급 가능한 수량을 초과합니다. total : %s, issued: %s".formatted(totalQuantity, issuedQuantity)); //예외는 커스텀예외 권장
         }
 
         //기한검증
         if(!availableIssueDate()) {
-            throw new RuntimeException("기한 검증"); //예외는 커스텀예외 권장
+            throw new CouponIssueException(INVALID_COUPON_ISSUE_DATE, "발급 가능한 일자가 아닙니다. request : %s, issueStart : %s, issueEnd : %s".formatted(LocalDateTime.now(), dateIssueStart, dateIssueEnd)); //예외는 커스텀예외 권장
         }
 
         //검증 다통과되어야 수행

@@ -2,8 +2,11 @@ package com.fastcampus.couponcore.model;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.fastcampus.couponcore.exception.CouponIssueException;
+import com.fastcampus.couponcore.exception.ErrorCode;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -101,5 +104,19 @@ class CouponTest {
         coupon.issue();
 
         assertEquals(coupon.getIssuedQuantity(), 100);
+    }
+
+    @Test
+    @DisplayName("발급 수량초과 시 예외 발생")
+    void issue_2() {
+        Coupon coupon = Coupon.builder()
+            .totalQuantity(100)
+            .issuedQuantity(100)
+            .dateIssueStart(LocalDateTime.now().minusDays(1))
+            .dateIssueEnd(LocalDateTime.now().plusDays(2))
+            .build();
+
+        CouponIssueException exception = assertThrows(CouponIssueException.class, coupon::issue);
+        assertEquals(exception.getErrorCode(), ErrorCode.INVALID_COUPON_ISSUE_QUANTITY);
     }
 }
